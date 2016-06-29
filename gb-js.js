@@ -3,13 +3,19 @@
  */
 
 var mousePos;
+var isDragging = false;
 
 $("#Capa_2").mousedown(function () {
+    isDragging=true;
     $("#Capa_2").hide();
     $("#Capa_1").show();
     $("#Layer_1").show();
+    var audio = document.getElementById("audio");
+    audio.play();
 });
 $("#Capa_1").mouseup(function () {
+    isDragging=false;
+    clearOpacity();
     $("#Capa_1").hide();
     $("#Layer_1").hide();
     $("#Capa_2").show();
@@ -45,7 +51,30 @@ function handleMouseMove(event) {
         y: event.y
     };
 
-    $("#label").innerHTML="x: "+mousePos.x+" , y: "+mousePos.y;
+
+    if(isDragging) {
+
+        var flamePosition = document.getElementById("Layer_1").getBoundingClientRect();
+
+        var hiddenElement = $(".hidden-link");
+        for(var i=0; i<hiddenElement.length; i++) {
+            var titlePosition = hiddenElement[i].getBoundingClientRect();
+            var distance = Math.sqrt(Math.pow(Math.abs(flamePosition.top) - titlePosition.bottom, 2) + Math.pow(Math.abs(flamePosition.left) - titlePosition.left, 2));
+            if (distance < 100) {
+                var opacity;
+                if(distance<0) {opacity=1;}
+                else {
+                    opacity = 1 - distance / 100;
+                }
+                hiddenElement[i].style.opacity= opacity;
+        }
+    }
+}
+
+
+
+
+
 }
 function getMousePosition() {
     var pos = mousePos;
@@ -104,7 +133,17 @@ function dragMoveListener (event) {
     target.setAttribute('data-y', y);
 
     //update items alpha
+
 }
+
+
+function clearOpacity(){
+    var hiddenElement = $(".hidden-link");
+    for(var i=0; i<hiddenElement.length; i++) {
+        hiddenElement[i].style.opacity= "0";
+    }
+}
+
 
 // this is used later in the resizing and gesture demos
 window.dragMoveListener = dragMoveListener;
